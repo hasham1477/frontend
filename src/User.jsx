@@ -2,15 +2,14 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Maps from "./Maps"
-import UserData from "./UserData";
+
+import  {DynamicFields } from "./DynamicFields";
+import  DataTable  from "./DataTable";
 
 const User=()=>{
     const navigate=useNavigate();
     const[data,setData]=useState(null);
-    const handleLog=()=>{
-        localStorage.removeItem("token")
-        navigate("/login",{replace:true})
-    }
+   
     useEffect(()=>{
         const getData=()=>{
             axios.get("http://localhost:4000/api/auth/user",{
@@ -25,18 +24,11 @@ const User=()=>{
         }
         getData()
     },[])
+    
     return(
         <>
-        {
-            data && <>
-                <h1>{data.name}</h1>
-                <h1>{data.username}</h1>
-                <button className="border-2 px-3 py-1 mb-3" onClick={handleLog}>Logout</button>
-            </>
-            
-        }
-        <UserData/>
-
+        <DataTable/>
+       
         </>
     )
 }

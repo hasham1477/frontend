@@ -2,7 +2,8 @@ import { useEffect, useState } from "react"
 import Login from "./Login"
 import { Navigate, Route, Routes, useLocation } from "react-router-dom"
 import User from "./User"
-
+import Nav from "./Nav"
+import {Bounce, ToastContainer} from "react-toastify"
 
 const App=()=>{
   const[login,setLogin]=useState(false)
@@ -13,7 +14,27 @@ const App=()=>{
     token ? setLogin(true) : setLogin(false)
   },[path])
   return(
+    <>
+    <ToastContainer
+position="top-right"
+autoClose={3000}
+hideProgressBar={false}
+newestOnTop={false}
+closeOnClick
+rtl={false}
+pauseOnFocusLoss
+draggable
+pauseOnHover
+theme="light"
+transition={Bounce}
+></ToastContainer>
+
+    
+    {
+      login && <Nav/>
+    }
     <Routes>
+     
       {
         login ?(
           <>
@@ -31,6 +52,7 @@ const App=()=>{
         )
       }
     </Routes>
+    </>
   )
 }
 

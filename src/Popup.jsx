@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { useForm } from "react-hook-form"
 import { axiosRequest } from "./axiosRequest";
+import { toast } from "react-toastify";
 
-export const EditPopUp=({formType,handlePop,empDetails})=>{
+export const EditPopUp=({formType,handlePop,empDetails,set})=>{
     
-    const{register,handleSubmit,setValue,formState:{errors,isDirty}}=useForm({defaultValues:empDetails});
+    const{register,handleSubmit,formState:{errors,isDirty}}=useForm({defaultValues:empDetails});
     const[loading,setLoading]=useState(false)
     const submitForm = async (data) => {
         setLoading(true);
@@ -15,8 +16,9 @@ export const EditPopUp=({formType,handlePop,empDetails})=>{
     
           const method = formType === "edit" ? "PUT" : "POST";
           const res = await axiosRequest(method, url, data);
-          alert(res);
+          toast.success(res);
           handlePop(false);
+          set(data)
         } catch (error) {
           console.error(error);
         } finally {
@@ -71,7 +73,7 @@ export const EditPopUp=({formType,handlePop,empDetails})=>{
                {
                 formType==="edit"?
                 <div>
-                <button type="submit" className="w-full border-2 py-2 text-xl font-semibold">Save</button>
+                <button type="submit" className={`w-full border-2 py-2 text-xl font-semibold opacity-40 ${isDirty && 'bg-black text-white opacity-100'}`} disabled={!isDirty}>Save</button>
             </div>:
                 <div>
                     <button type="submit" className="w-full border-2 py-2 text-xl font-semibold">{loading ? "Adding...": "Add Details"}</button>
@@ -79,7 +81,7 @@ export const EditPopUp=({formType,handlePop,empDetails})=>{
                }
 
 
-                <div className="absolute top-1 right-5 text-rose-400 text-2xl" onClick={()=>handlePop((p)=>!p)}><i class="fa-solid fa-xmark"></i></div>
+                <div className="absolute top-1 right-5 text-rose-400 text-2xl" onClick={()=>handlePop((p)=>!p)}><i className="fa-solid fa-xmark"></i></div>
             </form>
         </div>
         </>
@@ -87,7 +89,7 @@ export const EditPopUp=({formType,handlePop,empDetails})=>{
 }
 
 
-export const DeletePop=({empDetails,handlePop})=>{
+export const DeletePop=({empDetails,handlePop,set})=>{
     
     const handeldelEmp = async () => {
         
@@ -98,8 +100,13 @@ export const DeletePop=({empDetails,handlePop})=>{
     
         try {
           
-          await axiosRequest("DELETE", `http://localhost:4000/api/del/${empDetails.id}`);
-          handlePop(false); 
+          await axiosRequest("DELETE", `http://localhost:4000/api/del/${empDetails.id}`).then((res)=>{
+            toast.success(res)
+            handlePop(false); 
+          set(empDetails)
+          });
+          
+          
         } catch (error) {
           console.error("Error deleting employee", error);
         }
@@ -107,11 +114,12 @@ export const DeletePop=({empDetails,handlePop})=>{
     return(
         <>
           <div className="h-screen w-screen before:content-[''] before:w-full before:h-full before:bg-black before:absolute before:-z-10 isolate before:inset-0 before:opacity-30 absolute top-0 left-0 flex justify-center items-center">
-             <div className="w-1/3 px-14 py-6 bg-white">
-                <h6>Are You Sure to Delete</h6>
+             <div className=" px-14 py-6 bg-white">
+                <h6>Are You Sure Want to Delete</h6>
                 {
-                    empDetails && <div>
-                        <p>{empDetails.name}</p>
+                    empDetails && <div className="flex flex-col justify-center">
+                        <p>{empDetails.name},{empDetails.email}</p>
+                     
                     </div>
                 }
                 <div>
